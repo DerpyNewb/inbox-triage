@@ -1,0 +1,13 @@
+row 2 | Pinecone Analytics | Junior Data Analyst | Applied | 2026-11-02 | next: Wait for reply | 17 days, no reply
+row 3 | Session Road Games | Junior Gameplay Programmer | Applied | 2026-10-16 | next: Email the studio if nothing by Friday | 34 days, no reply
+row 4 | Kennon Labs | AI Engineer | Screening | 2026-10-06 | next: Finish the take-home | 44 days, no reply
+row 5 | Burnham Data Co. | Data Analyst | Interview | 2026-10-18 | next: Send thank-you note and the dashboard sample | Due 15 days ago
+row 6 | Teachers Camp Tech | Backend Developer (Java) | Interview | 2026-10-24 | next: Technical interview on the follow-up date | Due 10 days ago
+row 7 | Mines View Studio | Unity Developer | Offer | 2026-10-11 | next:  | No next step
+row 8 | Loakan Systems | QA Tester | Rejected | 2026-09-26 | next:  | 
+row 9 | Camp John Hay Partners | Prompt Engineer | Ghosted | 2026-09-11 | next:  | 
+row 10 | Wright Park Media | AI Video Editor | Withdrawn | 2026-10-21 | next:  | 
+row 11 | Upper Session Labs | Automation Specialist | Not applied |  | next: Tailor the automation resume and apply | Due 8 days ago
+row 12 | Lourdes Grotto Software | Junior Software Engineer | Not applied |  | next: Check whether they take fresh grads | 
+row 13 | Burnham Data Co. | BI Developer | On hold | 2026-10-26 | next: Ask Marco if this one reopens | 
+row 14 | Dominican Hill Digital | Data Entry and Reporting | Applied | late Sep 2026 | next: Look for their reply in spam | 

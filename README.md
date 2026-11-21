@@ -96,10 +96,11 @@ together, not how well the model handles real mail.
 - With the recorded answers in `fixtures/outputs.jsonl`: category 15/16, company 10/10, row 10/10. The miss
   is deliberate: one recorded answer quotes a sentence that isn't in the email, and the check rejects it.
 - With live `gemini-3.5-flash` on 2026-11-21 (`eval --live`): category 16/16, company 11/11, row 11/11.
-- In n8n with `workflow.demo.json` on 2026-11-21: on the first run, 11 of the 12 emails sent to the model
-  were handled as expected (5 rows updated, 3 sent to review, 3 needing no change). The twelfth, the offer,
-  got "Service unavailable" from both models, so it was marked failed; the next run picked up only that
-  email and sent it to review, as offers always are.
+- In n8n with `workflow.demo.json` on 2026-11-21: `gemini-3.5-flash` answered "Service unavailable" to all
+  12 calls, so the fallback, `gemini-3.5-flash-lite`, did the work. 11 of the 12 emails were handled as
+  expected (5 rows updated, 3 sent to review, 3 needing no change). The twelfth, the offer, got no answer
+  from either model, so it was marked failed; the next run picked up only that email and sent it to
+  review, as offers always are.
 
 ## Files
 

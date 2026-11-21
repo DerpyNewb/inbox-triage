@@ -116,6 +116,13 @@ test('each fixture gets the right decision', () => {
   assert.equal(outcome(byId('m05')).alert, 'Offer: Teachers Camp Tech');
 });
 
+test('a model that does not answer means try again; a bad answer means review', () => {
+  const src = sortMail([MAIL[0]], [])[0];
+  for (const res of [{ error: 'Service unavailable' }, { error: "Model output doesn't fit required format" }, {}])
+    assert.equal(decide(checkItem(res, src), null).action, 'failed', JSON.stringify(res));
+  assert.equal(decide(byId('m16'), null).action, 'review');
+});
+
 test('a convincing rejection from an outside domain changes nothing, even in the inbox', () => {
   const m = { ...byId('m11'), spam: false };
   assert.match(outcome(m).reason, /pinecone-careers\.example doesn't name/);

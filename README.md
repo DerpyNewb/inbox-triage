@@ -29,7 +29,9 @@ workflow, and scores the answers against the expected labels.
    `set NODES_EXCLUDE=["n8n-nodes-base.localFileTrigger"]`, then `npx n8n`.
 2. Import `workflow.demo.json`. It is the real workflow with the two Gmail nodes swapped for the sample
    emails, and every command runs with `--dry-run` against `fixtures/tracker.txt`.
-3. Open the **Gemini** node and create a Google Gemini credential with your API key.
+3. Open the **Gemini** node and create a Google Gemini credential with your API key, then pick the same
+   credential in **Gemini fallback**. The workflow uses `gemini-3.5-flash` and falls back to
+   `gemini-3.5-flash-lite` when it fails, so both run on the one key.
 4. Click **Run now**, then run `node triage.mjs stats --dry-run` and `node triage.mjs review --dry-run`.
 
 A free key allows 20 Gemini requests a day per model, and one run uses 12 (the other 4 emails never reach
@@ -82,7 +84,8 @@ command, which backs up the workbook before every save.
 - A row's status only moves forward.
 - Text from the model reaches `triage.mjs` as base64, and `jt` runs without a shell, so text in an email
   can't become a command.
-- When the model fails or is rate-limited, the email goes to review; nothing is guessed.
+- When the model doesn't answer (an outage, a rate limit, an unreadable reply), the email is marked failed
+  and tried again on the next run. When it answers badly, the email goes to review. Nothing is guessed.
 - The logs record metadata only: message ID, sender domain, category, row and outcome.
 
 ## Results so far
@@ -93,6 +96,10 @@ together, not how well the model handles real mail.
 - With the recorded answers in `fixtures/outputs.jsonl`: category 15/16, company 10/10, row 10/10. The miss
   is deliberate: one recorded answer quotes a sentence that isn't in the email, and the check rejects it.
 - With live `gemini-3.5-flash` on 2026-11-21 (`eval --live`): category 16/16, company 11/11, row 11/11.
+- In n8n with `workflow.demo.json` on 2026-11-21: on the first run, 11 of the 12 emails sent to the model
+  were handled as expected (5 rows updated, 3 sent to review, 3 needing no change). The twelfth, the offer,
+  got "Service unavailable" from both models, so it was marked failed; the next run picked up only that
+  email and sent it to review, as offers always are.
 
 ## Files
 
@@ -123,8 +130,8 @@ separate `dry/` folder. Logs live in `%LOCALAPPDATA%\inbox-triage\` (`INBOX_TRIA
 
 ## Tests
 
-`node --test test.mjs` runs 13 tests on the fictional fixtures. They cover redaction, routing, the output
-check, matching, every decision rule, a prompt-injection email, the generated Code nodes, a dry run of the
+`node --test test.mjs` runs 14 tests on the fictional fixtures. They cover redaction, routing, the output
+check, matching, every decision rule, retrying when the model doesn't answer, a prompt-injection email, the generated Code nodes, a dry run of the
 whole command-line flow, and a real `jt` run against a temporary copy of job-tracker's sample workbook.
 That last test is skipped when `jt` isn't installed, as on the CI runner.
 

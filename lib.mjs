@@ -193,7 +193,9 @@ export function decide(m, match) {
   const label = { interview: 'Interview', action_needed: 'To do', offer: 'Offer' }[m.category];
   const alert = label ? `${label}: ${m.company}` : '';
   const review = (reason) => ({ action: 'review', args: [], alert, reason });
-  if (m.check !== 'ok') return { action: 'review', args: [], alert: '', reason: m.reason };
+  // No answer (outage, rate limit, unreadable reply): try again next run. A bad answer: a person looks.
+  if (m.check !== 'ok')
+    return { action: /^(model error|no model output)/.test(m.reason) ? 'failed' : 'review', args: [], alert: '', reason: m.reason };
   if (m.category === 'other') return { action: 'no_change', args: [], alert: '', reason: 'not about an application' };
   if (!match?.row) return review(match?.reason || 'no matching row');
   const r = match.row;

@@ -161,6 +161,7 @@
         "promptType": "define",
         "text": "=From: {{ $json.from }}\nDate: {{ $json.date }}\nSubject: {{ $json.subject }}\n\n{{ $json.text }}",
         "hasOutputParser": true,
+        "needsFallback": true,
         "messages": {
           "messageValues": [
             {
@@ -177,11 +178,28 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        1300,
+        1220,
         220
       ],
       "parameters": {
         "modelName": "models/gemini-3.5-flash",
+        "options": {
+          "temperature": 0,
+          "maxOutputTokens": 1024
+        }
+      }
+    },
+    {
+      "id": "6a17bfc2-9bad-e9db-c810-c19abec494b8",
+      "name": "Gemini fallback",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        220
+      ],
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
         "options": {
           "temperature": 0,
           "maxOutputTokens": 1024
@@ -388,6 +406,17 @@
             "node": "Extract",
             "type": "ai_languageModel",
             "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini fallback": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extract",
+            "type": "ai_languageModel",
+            "index": 1
           }
         ]
       ]

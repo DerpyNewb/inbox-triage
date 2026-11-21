@@ -29,6 +29,8 @@ return $input.all().map((item) => ({ json: { id: item.json.id ?? null, b64: pack
 // Google has retired gemini-2.5-flash for new keys, and gemini-3.8-flash was overloaded on 2026-11-21,
 // so this is the one that answered. GEMINI_MODEL overrides it for eval --live; in n8n, pick it in the Gemini node.
 export const MODEL = 'gemini-3.5-flash';
+// Used by the workflow when MODEL fails. A different family has its own capacity and its own daily free quota.
+export const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
 
 export const PROMPT = `You sort emails that arrive in a job seeker's inbox. Return:
 
@@ -103,10 +105,15 @@ export function workflow(extra = '') {
       promptType: 'define',
       text: '=From: {{ $json.from }}\nDate: {{ $json.date }}\nSubject: {{ $json.subject }}\n\n{{ $json.text }}',
       hasOutputParser: true,
+      needsFallback: true,
       messages: { messageValues: [{ message: PROMPT }] },
     }, { onError: 'continueRegularOutput' }),
-    node('Gemini', '@n8n/n8n-nodes-langchain.lmChatGoogleGemini', 1, [1300, 220], {
+    node('Gemini', '@n8n/n8n-nodes-langchain.lmChatGoogleGemini', 1, [1220, 220], {
       modelName: `models/${MODEL}`,
+      options: { temperature: 0, maxOutputTokens: 1024 },
+    }),
+    node('Gemini fallback', '@n8n/n8n-nodes-langchain.lmChatGoogleGemini', 1, [1340, 220], {
+      modelName: `models/${FALLBACK_MODEL}`,
       options: { temperature: 0, maxOutputTokens: 1024 },
     }),
     node('Output schema', '@n8n/n8n-nodes-langchain.outputParserStructured', 1, [1460, 220], {
@@ -136,6 +143,7 @@ export function workflow(extra = '') {
     'To the model?': { main: [[to('Extract')], [to('Merge back', 1)]] },
     Extract: { main: [[to('Check extraction')]] },
     Gemini: { ai_languageModel: [[{ node: 'Extract', type: 'ai_languageModel', index: 0 }]] },
+    'Gemini fallback': { ai_languageModel: [[{ node: 'Extract', type: 'ai_languageModel', index: 1 }]] },
     'Output schema': { ai_outputParser: [[{ node: 'Extract', type: 'ai_outputParser', index: 0 }]] },
     'Check extraction': { main: [[to('Merge back', 0)]] },
     'Merge back': { main: [[to('Pack')]] },
@@ -169,9 +177,9 @@ export function sampleWorkflow(recorded) {
   }
   const outputs = Object.fromEntries(jsonl('./fixtures/outputs.jsonl').map((o) => [o.id, o]));
   swap('Extract', `const out = ${JSON.stringify(outputs)};\nreturn $input.all().map((it, i) => ({ json: out[it.json.id] ?? {}, pairedItem: { item: i } }));`);
-  w.nodes = w.nodes.filter((n) => n.name !== 'Gemini' && n.name !== 'Output schema');
-  delete w.connections.Gemini;
-  delete w.connections['Output schema'];
+  const llm = ['Gemini', 'Gemini fallback', 'Output schema'];
+  w.nodes = w.nodes.filter((n) => !llm.includes(n.name));
+  for (const name of llm) delete w.connections[name];
   return { ...w, id: 'inboxTriageFixt1', name: 'Inbox triage (sample emails, recorded answers)' };
 }
 

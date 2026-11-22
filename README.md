@@ -85,7 +85,7 @@ command, which backs up the workbook before every save.
 - Text from the model reaches `triage.mjs` as base64, and `jt` runs without a shell, so text in an email
   can't become a command.
 - When the model doesn't answer (an outage, a rate limit, an unreadable reply), the email is marked failed
-  and tried again on the next run. When it answers badly, the email goes to review. Nothing is guessed.
+  and tried again on the next run. When it answers badly, the email goes to review.
 - The logs record metadata only: message ID, sender domain, category, row and outcome.
 
 ## Results so far
